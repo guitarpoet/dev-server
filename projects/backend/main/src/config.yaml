@@ -1,0 +1,53 @@
+################################################################################
+#
+# This is the configuration file for the backend demo app
+#
+# @author Jack <jack@thinkingcloud.info>
+# @version 0.0.1
+# @date Wed Feb  7 10:33:30 2018
+#
+################################################################################
+
+#===============================================================================
+#
+# Include the values in package.json
+#
+#===============================================================================
+
+#json ../package.json
+
+#===============================================================================
+#
+# Section Logging
+#
+#===============================================================================
+
+logging:
+    $type: module
+    $name: LogConfig
+    ^appenders/console/type: console
+    ^categories/default:
+        appenders:
+            - console
+        level: TRACE
+
+#===============================================================================
+#
+# Section App
+#
+#===============================================================================
+
+app:
+    $type: module
+    $name: App
+    metadata:
+        version: $(version)
+        addHelp: true
+        description: $(description)
+    options:
+        -
+            option: [-c, --command]
+            help: |
+                The commands to run
+            defaultValue: test
+

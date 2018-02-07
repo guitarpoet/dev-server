@@ -1,0 +1,32 @@
+{
+    "name": "@guitarpoet/dev-server",
+    "version": "0.0.1",
+    "description": "The dev server which used for demostration and test for next generation UI development",
+    "main": "index.js",
+    "scripts": {
+        "test": "make test"
+    },
+    "keywords": [
+        "dev",
+        "server",
+        "express"
+    ],
+    "author": "Jack <jack@thinkingcloud.info>",
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "babel-cli": "^6.26.0",
+        "babel-plugin-transform-react-jsx": "^6.24.1"
+    },
+    "dependencies": {
+        "@guitarpoet/configurator": "0.0.1",
+        "@guitarpoet/midori": "0.0.2",
+        "express": "^4.16.2",
+        "hot-pepper-jelly": "0.0.7",
+        "log4js": "^2.5.2",
+        "node-sass": "^4.7.2",
+        "react": "^16.2.0",
+        "react-redux": "^5.0.6",
+        "react-router": "^4.2.0",
+        "react-router-redux": "^4.0.8"
+    }
+}

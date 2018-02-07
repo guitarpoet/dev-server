@@ -1,0 +1,44 @@
+#!/bin/sh
+
+################################################################################
+#
+# The tool script to run commands
+#
+# @author Jack <jack@thinkingcloud.info>
+# @version 0.0.1
+# @date Wed Feb  7 10:53:16 2018
+#
+################################################################################
+
+SOURCE="${BASH_SOURCE[0]}"
+SCRIPT_DIR=`dirname ${SOURCE}`
+
+# Include the environments
+. ${SCRIPT_DIR}/env.sh
+# Include the functions
+. ${SCRIPT_DIR}/functions.sh
+
+# Get the command to run
+
+if [[ -z $1 ]]
+then
+    COMMAND=usage
+else
+    COMMAND=$1
+fi
+
+# Let's run the commands
+case ${COMMAND} in
+    be)
+        run_be $2
+        ;;
+    main)
+        start_node index.js ${@:2}
+        ;;
+    shell)
+        start_node
+        ;;
+    *)
+        usage
+        ;;
+esac

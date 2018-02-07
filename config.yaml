@@ -1,0 +1,37 @@
+################################################################################
+#
+# This is the conifguration file for the dev server
+#
+# @author Jack <jack@thinkingcloud.info>
+# @version 0.0.1
+# @date Mon Feb  5 15:15:04 2018
+#
+################################################################################
+
+#include ./common.yaml
+
+#===============================================================================
+#
+# Section Project Configuration
+#
+#===============================================================================
+
+projects:
+    $type: module
+    $module: ./model
+    $name: Projects
+    ^backend/projects: # The backend project configuration
+        -
+            $base: *project-template
+            base: ./projects/backend/main
+            initializer: init.js
+            watchFolders:
+                - src/router
+                - src/utils
+    ^frontend/projects: # The frontend project configuration
+        -
+            $base: *project-template
+            base: ./projects/frontend/main
+            webpack: # The webpack configuration
+                config:
+                    - webpack/webpack.development

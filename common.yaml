@@ -1,0 +1,70 @@
+################################################################################
+#
+# This is the common include yaml file for the configuration
+#
+# @author Jack <jack@thinkingcloud.info>
+# @version 0.0.1
+# @date Tue Feb  6 17:35:42 2018
+#
+################################################################################
+
+#===============================================================================
+#
+# Include the values in package.json
+#
+#===============================================================================
+
+#json ./package.json
+
+#===============================================================================
+#
+# Section Templates
+#
+#===============================================================================
+
+templates:
+    project-template: &project-template
+        $type: module
+        $module: ./model
+        $name: Project
+        nodepath: src
+
+#===============================================================================
+#
+# Section Logging
+#
+#===============================================================================
+
+logging:
+    $type: module
+    $name: LogConfig
+    ^appenders/console/type: console
+    ^categories/default:
+        appenders:
+            - console
+        level: TRACE
+
+#===============================================================================
+#
+# Section Commandline Configuration
+#
+#===============================================================================
+
+app:
+    $type: module
+    $name: App
+    metadata:
+        version: $(version)
+        addHelp: true
+        description: $(description)
+    options:
+        -
+            option: [-c, --command]
+            help: |
+                The commands to run
+            defaultValue: test
+        -
+            option: [-f, --filter]
+            help: |
+                The project filter that you want to use, it can be the type only(say be, fe), or you can add the name for filtering them, say be{demo-be}, and the name can be regex based, say be{demo-.+}
+            defaultValue: 
