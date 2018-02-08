@@ -32,6 +32,9 @@ case ${COMMAND} in
     be)
         run_be $2
         ;;
+    dbe)
+        debug_be $2
+        ;;
     main)
         start_node index.js ${@:2}
         ;;

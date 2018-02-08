@@ -1,0 +1,73 @@
+################################################################################
+#
+# This is the configuration file for routing
+#
+# @author Jack <jack@thinkingcloud.info>
+# @version 0.0.1
+# @date Wed Feb  7 10:33:30 2018
+#
+################################################################################
+
+#===============================================================================
+#
+# Template Section
+#
+#===============================================================================
+
+route-templates:
+    abstract-filter: &abstract-filter
+        $type: function
+        $module: ./models
+    abstract-route: &abstract-route
+        filters:
+            -
+                $base: *abstract-filter
+                $name: logRequest
+    routes-template: &base-routes
+        $type: module
+        $module: ./models
+        $name: Routes
+        $router:
+            mergeParams: true
+    base-route-template: &base-route
+        $base: *abstract-route
+        $type: function
+        $module: ./models
+    redirect-route-template: &redirect-route
+        $base: *abstract-route
+        $type: module
+        $module: ./models
+        $name: RedirectRoute
+
+#===============================================================================
+#
+# Routes Section
+#
+#===============================================================================
+
+route_config:
+    $base: *base-routes
+    root: / # This is required, so that the router can know its service request, this context can allow multiple server module run at the same express server
+    routes:
+        /: # The root route will redirect to dashboard
+            $base: *redirect-route
+            to: /dashboard
+        /test: 
+            $base: *base-route
+            $name: test
+        /dashboard:
+            $base: *base-routes
+            routes:
+                /:
+                    $base: *base-route
+                    $name: dashboard
+                /demo:
+                    $base: *base-route
+                    $name: dashboardDemo
+    handlers:
+        404:
+            $base: *base-route
+            $name: notFound
+        500:
+            $base: *base-route
+            $name: serverError

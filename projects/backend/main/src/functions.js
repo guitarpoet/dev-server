@@ -1,23 +1,47 @@
 const { debug, log, global_registry, watch_and_reload } = require("hot-pepper-jelly");
+const express = require("express");
+const { get } = require("lodash");
 
-const init_app = (app) => {
-    // Let's add the app into the global registry
+/**
+ * This will init the express using the config
+ */
+const init_express = (config) => {
+    // Add the configuration into the global registry
+    global_registry("app_config", config);
+
+    // Construct the express now
+    let app = express();
+    
+    // Setup the configuration to the express
+    app.$config = config;
+
+    // Add the app into the global registry
     global_registry("app", app);
+
+    // Now return it
     return app;
 }
 
 const start_app = (app) => {
+    let port = get(app.$config, "server.port", 8080);
+
     return new Promise((resolve, reject) => {
         // Let's watch all file change in current folder, and reload them into NodeJS
         watch_and_reload([__dirname]);
 
-        app.listen(8080, () => {
+        debug("Listening to port {{port}}", {port});
+        app.listen(port, () => {
             resolve(app);
         });
     });
 }
 
+const handle_error = (error) => {
+    log("Error is {{error}}", {error}, "ERROR");
+}
+
 module.exports = {
-    init_app,
-    start_app
+    init_express,
+    start_app,
+    handle_error
 }

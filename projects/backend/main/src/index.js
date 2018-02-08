@@ -11,7 +11,17 @@
 const express = require("express");
 const { pipe, log } = require("hot-pepper-jelly");
 const { config } = require("@guitarpoet/configurator");
+const { init_express, start_app, handle_error } = require("./functions");
+const { Routes } = require("./models");
 
-pipe("./config.yaml")([config(require)]).then(() => {
-    log("Hi");
-}).catch(console.error);
+const add_routes = (app) => {
+    let { route_config } = app.$config;
+
+    if(route_config instanceof Routes) {
+        route_config.setup(app);
+    }
+    return app;
+}
+
+pipe("./config.yaml")([config(require), init_express, add_routes])
+    .then(start_app).catch(console.error);
