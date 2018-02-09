@@ -30,7 +30,7 @@ class Routes extends ConfigObjectBase {
     path(path) {
         this.$path = path;
         this.each((path, route) => {
-            if(route instanceof Routes) {
+            if(route.path && isFunction(route.path)) {
                 // It is a routes settings
                 route.path(resolve(this.$path, path));
             }
@@ -53,11 +53,11 @@ class Routes extends ConfigObjectBase {
             let chain = route.filters || [];
 
             // Let's setup the routes
-            if(route instanceof Routes) {
+            if(route.setup && isFunction(route.setup)) {
                 // Let's setup the routes into app
                 route.setup(app);
                 debug("Setting path {{path}} using routes directly", {path});
-            } else if(route instanceof Route) {
+            } else if(route.func && isFunction(route.func)) {
                 debug("Setting up path {{path}} using route", {path});
                 // Add the route into the chain
                 chain.push(route.func());
@@ -95,16 +95,10 @@ class Routes extends ConfigObjectBase {
 }
 
 class Route extends ConfigObjectBase {
-    _func(req, res) {
-    }
-
-    func() {
-        return this._func();
-    }
 }
 
 class RedirectRoute extends Route {
-    _func() {
+    func() {
         return (req, res) => (res.redirect(this.to));
     }
 }
@@ -126,7 +120,7 @@ const dashboardDemo = (req, res) => {
 }
 
 const test = (req, res) => {
-    res.send("Test");
+    res.send("Test Again");
 }
 
 const logRequest = (req, res, next) => {

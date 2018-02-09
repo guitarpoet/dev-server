@@ -9,19 +9,11 @@
 "use strict";
 
 const express = require("express");
-const { pipe, log } = require("hot-pepper-jelly");
+const { enable_hotload, pipe, log } = require("hot-pepper-jelly");
 const { config } = require("@guitarpoet/configurator");
-const { init_express, start_app, handle_error } = require("./functions");
-const { Routes } = require("./models");
+const { init_express, start_app, handle_error,  add_routes } = require("./functions");
 
-const add_routes = (app) => {
-    let { route_config } = app.$config;
-
-    if(route_config instanceof Routes) {
-        route_config.setup(app);
-    }
-    return app;
-}
+enable_hotload();
 
 pipe("./config.yaml")([config(require), init_express, add_routes])
     .then(start_app).catch(console.error);

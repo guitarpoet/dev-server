@@ -1,6 +1,7 @@
 const { debug, log, global_registry, watch_and_reload } = require("hot-pepper-jelly");
 const express = require("express");
-const { get } = require("lodash");
+const { get, isFunction } = require("lodash");
+const { Routes } = require("./models");
 
 /**
  * This will init the express using the config
@@ -36,6 +37,15 @@ const start_app = (app) => {
     });
 }
 
+const add_routes = (app) => {
+    let { route_config } = app.$config;
+
+    if(route_config.setup && isFunction(route_config.setup)) {
+        route_config.setup(app);
+    }
+    return app;
+}
+
 const handle_error = (error) => {
     log("Error is {{error}}", {error}, "ERROR");
 }
@@ -43,5 +53,6 @@ const handle_error = (error) => {
 module.exports = {
     init_express,
     start_app,
+    add_routes,
     handle_error
 }

@@ -36,10 +36,10 @@ run_be() {
     if [[ -z $1 ]]
     then
         # No be filters
-        entry=`start_node ${BASE_DIR}/index.js -c entries -f be`
+        entry=`entries -f be`
     else
         # We have a filter to run be
-        entry=`start_node ${BASE_DIR}/index.js -c entries -f "be{$1}"`
+        entry=`entries -f be{$1}`
     fi
 
     if [[ -z ${entry} ]]
@@ -59,10 +59,10 @@ debug_be() {
     if [[ -z $1 ]]
     then
         # No be filters
-        entry=`start_node ${BASE_DIR}/index.js -c entries -f be`
+        entry=`entries -f be`
     else
         # We have a filter to run be
-        entry=`start_node ${BASE_DIR}/index.js -c entries -f "be{$1}"`
+        entry=`entries -f be{$1}`
     fi
 
     if [[ -z ${entry} ]]
@@ -76,6 +76,10 @@ debug_be() {
     else
         debug_node ${entry}
     fi
+}
+
+entries() {
+    start_node ${BASE_DIR}/index.js -c entries $* | grep -v DEBUG
 }
 
 start_node() {

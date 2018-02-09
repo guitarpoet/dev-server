@@ -19,6 +19,7 @@ route-templates:
         $type: function
         $module: ./models
     abstract-route: &abstract-route
+        $reload: true # This will indicate the module should be loaded using with the reload support
         filters:
             -
                 $base: *abstract-filter
