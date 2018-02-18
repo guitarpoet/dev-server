@@ -29,8 +29,19 @@ class Projects extends ConfigObjectBase {
     frontends() {
         return this.get("frontend.projects", []);
     }
+
     all() {
-        return arrayMerge(this.backends(), this.frontends());
+        let ret = [];
+        let bes = this.backends();
+        if(bes && bes.length) {
+            ret = ret.concat(bes);
+        }
+
+        let fes = this.frontends();
+        if(fes && fes.length) {
+            ret = ret.concat(fes);
+        }
+        return ret;
     }
 }
 
@@ -43,7 +54,7 @@ class Project extends ConfigObjectBase {
     }
 
     $basePath() {
-        return path.resolve(this.get("base"));
+        return path.resolve(this.base);
     }
 
     $packageConfig() {

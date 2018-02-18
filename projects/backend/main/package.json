@@ -9,8 +9,8 @@
     "devDependencies": {
     },
     "dependencies": {
-        "@guitarpoet/configurator": "0.0.1",
-        "hot-pepper-jelly": "0.0.7",
+        "@guitarpoet/configurator": "0.0.4",
+        "express": "^4.16.2",
         "log4js": "^2.5.2"
     },
     "author": "Jack <jack@thinkingcloud.info>",

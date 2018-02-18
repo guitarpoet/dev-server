@@ -18,10 +18,9 @@
         "babel-plugin-transform-react-jsx": "^6.24.1"
     },
     "dependencies": {
-        "@guitarpoet/configurator": "0.0.1",
+        "@guitarpoet/configurator": "0.0.4",
         "@guitarpoet/midori": "0.0.2",
         "express": "^4.16.2",
-        "hot-pepper-jelly": "0.0.7",
         "log4js": "^2.5.2",
         "node-sass": "^4.7.2",
         "react": "^16.2.0",

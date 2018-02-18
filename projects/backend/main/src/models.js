@@ -30,9 +30,11 @@ class Routes extends ConfigObjectBase {
     path(path) {
         this.$path = path;
         this.each((path, route) => {
-            if(route.path && isFunction(route.path)) {
-                // It is a routes settings
-                route.path(resolve(this.$path, path));
+            for(let e of [route, route.$ui]) {
+                if(e && e.path && isFunction(e.path)) {
+                    // It is a routes settings
+                    e.path(resolve(this.$path, path));
+                }
             }
         });
     }
@@ -97,6 +99,41 @@ class Routes extends ConfigObjectBase {
 class Route extends ConfigObjectBase {
 }
 
+class ReactRoute extends Route {
+    path(path = null) {
+        if(path) {
+            this.$path = path;
+            if(this.element && this.element.$addRoute) {
+                // Add this to the element's route
+                this.element.$addRoute(path, this);
+            }
+        }
+        return this.$path;
+    }
+}
+
+class ReactUI extends Route {
+    $addRoute(path, route) {
+		if(!ReactUI.$elements) {
+			ReactUI.$elements = {};
+		}
+
+        if(!ReactUI.$elements[this.entry]) {
+            ReactUI.$elements[this.entry] = {};
+        }
+
+        ReactUI.$elements[this.entry][path] = route;
+    }
+
+    $routes() {
+        return ReactUI.$elements[this.entry];
+    }
+
+	$ui() {
+		return ReactUI;
+	}
+}
+
 class RedirectRoute extends Route {
     func() {
         return (req, res) => (res.redirect(this.to));
@@ -112,7 +149,7 @@ const serverError = (err, req, res, next) => {
 }
 
 const dashboard = (req, res) => {
-    res.send("Dashboard");
+    res.send("Dashboard Test");
 }
 
 const dashboardDemo = (req, res) => {
@@ -132,6 +169,8 @@ module.exports = {
     Route,
     RedirectRoute,
     Routes,
+    ReactUI,
+    ReactRoute,
     dashboard,
     dashboardDemo,
     notFound,

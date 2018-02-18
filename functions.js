@@ -6,7 +6,7 @@
  * @date Tue Feb  6 16:21:50 2018
  */
 
-const { enable_hotload, global_registry, log, debug } = require("hot-pepper-jelly");
+const { global_registry, log, debug } = require("hot-pepper-jelly");
 const { isArray } = require("lodash");
 const path = require("path");
 const FILTER_PATTERN = /^([bef]+)(\{([^\{\}]+)\})?$/;
@@ -54,8 +54,6 @@ const nodepath = () => {
 };
 
 const bootstrap = (app) => {
-    // Enabled the hot reload first, since we are the dev server anyway
-    enable_hotload();
     return app;
 }
 

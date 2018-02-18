@@ -30,6 +30,10 @@ route-templates:
         $name: Routes
         $router:
             mergeParams: true
+    base-react-route-template: &base-react-route
+        $type: module
+        $module: ./models
+        $name: ReactRoute
     base-route-template: &base-route
         $base: *abstract-route
         $type: function
@@ -39,6 +43,28 @@ route-templates:
         $type: module
         $module: ./models
         $name: RedirectRoute
+
+#===============================================================================
+#
+# Elements Section
+#
+#===============================================================================
+elements:
+    dashboard-ui: &dashboard-ui # The UI element is used for identify the ui element of this route, the UI element will indicate the routing configuration for the fronend
+        $type: module
+        $module: ./models
+        $name: ReactUI
+        entry: main.js # This is the entry file, mostly it is used for webpack, so if you don't have webpack, you can leave this as blank
+        js: # This is the configuration for other js files that are needed
+            #ifenv DEV_SERVER
+            - hotload.js
+            #else
+            - share.js
+            - vendor.js
+            - main.js
+        css:
+            - share.css
+            #endif
 
 #===============================================================================
 #
@@ -62,9 +88,23 @@ route_config:
                 /:
                     $base: *base-route
                     $name: dashboard
+                    $ui: 
+                        $base: *base-react-route
+                        element: *dashboard-ui
+                        attrs:
+                            - requireAuth
+                            - exact
+                        ^component/module: dashboard/dashboard.component
                 /demo:
                     $base: *base-route
                     $name: dashboardDemo
+                    $ui: 
+                        $base: *base-react-route
+                        element: *dashboard-ui
+                        attrs:
+                            - requireAuth
+                            - exact
+                        ^component/module: dashboard/dashboard.component.demo
     handlers:
         404:
             $base: *base-route

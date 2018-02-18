@@ -10,14 +10,15 @@
 "use strict";
 
 const { normal_start, handle_app_error } = require("@guitarpoet/configurator");
-const { log, debug, global_registry, enable_features } = require("hot-pepper-jelly");
+const { log, proxy_exclude_patterns, debug, global_registry, enable_features } = require("hot-pepper-jelly");
 const { bootstrap, nodepath, filterMatch } = require("./functions");
 const path = require("path");
 
+// Let's exclude all node modules files
+proxy_exclude_patterns([/.*node_modules.*/, /path/]);
+
 // Let's ensure our presence at the very begining
-process.env.DEV_SERVER = true;
 global_registry("DEV_SERVER", true);
-enable_features({dev_server: true});
 
 // Let's do the initialize first
 normal_start(require, {

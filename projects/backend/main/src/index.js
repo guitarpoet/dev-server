@@ -9,11 +9,12 @@
 "use strict";
 
 const express = require("express");
-const { enable_hotload, pipe, log } = require("hot-pepper-jelly");
-const { config } = require("@guitarpoet/configurator");
+const { log, proxy_exclude_patterns } = require("hot-pepper-jelly");
+const { configure } = require("@guitarpoet/configurator");
 const { init_express, start_app, handle_error,  add_routes } = require("./functions");
 
-enable_hotload();
+// Let's exclude all node modules files
+proxy_exclude_patterns([/.*node_modules.*/]);
 
-pipe("./config.yaml")([config(require), init_express, add_routes])
+configure([init_express, add_routes])
     .then(start_app).catch(console.error);

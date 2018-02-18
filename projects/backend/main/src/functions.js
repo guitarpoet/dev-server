@@ -1,6 +1,6 @@
-const { debug, log, global_registry, watch_and_reload } = require("hot-pepper-jelly");
+const { debug, log, global_registry, watch_and_reload, feature_enabled } = require("hot-pepper-jelly");
 const express = require("express");
-const { get, isFunction } = require("lodash");
+const { get, isFunction, keys } = require("lodash");
 const { Routes } = require("./models");
 
 /**
@@ -24,6 +24,10 @@ const init_express = (config) => {
 }
 
 const start_app = (app) => {
+    if(feature_enabled("mock")) {
+        // This is only for testing
+        return;
+    }
     let port = get(app.$config, "server.port", 8080);
 
     return new Promise((resolve, reject) => {
@@ -38,7 +42,11 @@ const start_app = (app) => {
 }
 
 const add_routes = (app) => {
-    let { route_config } = app.$config;
+    if(feature_enabled("mock")) {
+        // This is only for testing
+        return;
+    }
+    let { route_config, elements } = app.$config;
 
     if(route_config.setup && isFunction(route_config.setup)) {
         route_config.setup(app);
