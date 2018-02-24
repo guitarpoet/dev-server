@@ -56,7 +56,7 @@ elements:
     dashboard-ui: &dashboard-ui # The UI element is used for identify the ui element of this route, the UI element will indicate the routing configuration for the fronend
         $type: module
         $module: ./uis/WebpackUI
-        entry: bundle.js # This is the entry file, mostly it is used for webpack, so if you don't have webpack, you can leave this as blank
+        entry: /bundle.js # This is the entry file, mostly it is used for webpack, so if you don't have webpack, you can leave this as blank
 
 #===============================================================================
 #
@@ -85,17 +85,16 @@ route_config:
                         attrs:
                             - requireAuth
                             - exact
-                        ^component/module: dashboard/dashboard.component
+                        ^component/module: pages/Dashboard
                 /demo:
-                    $base: *base-route
-                    $name: dashboardDemo
+                    $base: *base-element-route
                     $ui: 
                         $base: *base-react-route
                         element: *dashboard-ui
                         attrs:
                             - requireAuth
                             - exact
-                        ^component/module: dashboard/dashboard.component.demo
+                        ^component/module: pages/DashboardDemo
     handlers:
         404:
             $base: *base-route

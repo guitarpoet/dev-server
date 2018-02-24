@@ -7,13 +7,39 @@
  */
 
 import React, { Component, PropTypes } from "react";
+import { syncHistoryWithStore } from "react-router-redux"
+import { getStore } from "./Store"
+import { Provider } from "react-redux"
+import { Router, browserHistory } from "react-router"
+import Routing from "./Routing"
+
+// The history of the application
+const history = syncHistoryWithStore(browserHistory, getStore());
 
 class Application extends Component {
+
+	componentDidMount() {
+		// Initial the history
+		this.history = history;
+
+		// Initial the state
+		this.state = {};
+
+		// Register it into global
+		window.$app = this;
+	}
+
+	getState(prop) {
+		return getStore().getState(prop);
+	}
+
 	render() {
 		return (
-			<div id="application" className="application wrapper">
-				{this.props.children}
-			</div>
+			<Provider store={getStore()}>
+				<Router history={history}>
+					{Routing}
+				</Router>
+			</Provider>
 		);
 	}
 }
