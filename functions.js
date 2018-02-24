@@ -6,10 +6,29 @@
  * @date Tue Feb  6 16:21:50 2018
  */
 
-const { global_registry, log, debug } = require("hot-pepper-jelly");
-const { isArray } = require("lodash");
+const { global_registry, log, debug, watch_and_reload } = require("hot-pepper-jelly");
+const { isArray, get } = require("lodash");
 const path = require("path");
 const FILTER_PATTERN = /^([bef]+)(\{([^\{\}]+)\})?$/;
+const express = require("express");
+const webpack = require("webpack");
+
+const init_express = (config) => {
+    // Add the configuration into the global registry
+    global_registry("app_config", config);
+
+    // Construct the express now
+    let app = express();
+
+    // Setup the configuration to the express
+    app.$config = config;
+
+    // Add the app into the global registry
+    global_registry("app", app);
+
+    // Now return it
+    return app;
+}
 
 const filterMatch = (filter) => (
     (project) => {
@@ -71,9 +90,40 @@ function arrayMerge() {
     return ret;
 }
 
+const start_app = (watchFolders = []) => ((app) => {
+    let port = get(app.$config, "server.port", 8080);
+
+    return new Promise((resolve, reject) => {
+        // Let's watch all file change in current folder, and reload them into NodeJS
+        watch_and_reload(watchFolders);
+
+        debug("Listening to port {{port}}", {port});
+        app.listen(port, () => {
+            resolve(app);
+        });
+    });
+})
+
+const init_webpack = (config) => {
+    // Add the resolve loaders
+    config.webpack.resolveLoader = {
+        modules: process.env.NODE_PATH.split(":"),
+        extensions: [".js"]
+    };
+
+    // Let's add the global node_modules into it
+    let n = path.resolve(path.join(__dirname, "node_modules"));
+    config.webpack.resolve.modules.push(n);
+
+    return webpack(config.webpack);
+}
+
 module.exports = {
     bootstrap,
     nodepath,
     filterMatch,
-    arrayMerge
+    arrayMerge,
+    init_express,
+    start_app,
+    init_webpack
 }

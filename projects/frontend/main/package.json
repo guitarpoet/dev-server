@@ -6,6 +6,11 @@
     "scripts": {
         "test": "make test"
     },
+    "devDependencies": {
+        "babel-cli": "^6.26.0",
+        "babel-plugin-transform-react-jsx": "^6.24.1",
+        "webpack": "^3.11.0"
+    },
     "author": "Jack <jack@thinkingcloud.info>",
     "license": "Apache-2.0"
 }

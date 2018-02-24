@@ -34,6 +34,10 @@ route-templates:
         $type: module
         $module: ./models
         $name: ReactRoute
+    base-element-route-template: &base-element-route
+        $base: *abstract-route
+        $type: module
+        $module: ./routes/ElementRoute
     base-route-template: &base-route
         $base: *abstract-route
         $type: function
@@ -41,8 +45,7 @@ route-templates:
     redirect-route-template: &redirect-route
         $base: *abstract-route
         $type: module
-        $module: ./models
-        $name: RedirectRoute
+        $module: ./routes/RedirectRoute
 
 #===============================================================================
 #
@@ -52,19 +55,8 @@ route-templates:
 elements:
     dashboard-ui: &dashboard-ui # The UI element is used for identify the ui element of this route, the UI element will indicate the routing configuration for the fronend
         $type: module
-        $module: ./models
-        $name: ReactUI
-        entry: main.js # This is the entry file, mostly it is used for webpack, so if you don't have webpack, you can leave this as blank
-        js: # This is the configuration for other js files that are needed
-            #ifenv DEV_SERVER
-            - hotload.js
-            #else
-            - share.js
-            - vendor.js
-            - main.js
-        css:
-            - share.css
-            #endif
+        $module: ./uis/WebpackUI
+        entry: bundle.js # This is the entry file, mostly it is used for webpack, so if you don't have webpack, you can leave this as blank
 
 #===============================================================================
 #
@@ -86,8 +78,7 @@ route_config:
             $base: *base-routes
             routes:
                 /:
-                    $base: *base-route
-                    $name: dashboard
+                    $base: *base-element-route
                     $ui: 
                         $base: *base-react-route
                         element: *dashboard-ui

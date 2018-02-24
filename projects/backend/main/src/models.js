@@ -11,6 +11,13 @@ const { Router } = require("express");
 const { resolve } = require("url");
 const { isFunction } = require("lodash");
 const { debug, log } = require("hot-pepper-jelly");
+const Route = require("./routes/Route");
+const RedirectRoute = require("./routes/RedirectRoute");
+const ElementRoute = require("./routes/ElementRoute");
+
+const joinUrl = (base, url) => {
+	return (base + url).replace("//", "/");
+}
 
 class Routes extends ConfigObjectBase {
     _init() {
@@ -33,7 +40,7 @@ class Routes extends ConfigObjectBase {
             for(let e of [route, route.$ui]) {
                 if(e && e.path && isFunction(e.path)) {
                     // It is a routes settings
-                    e.path(resolve(this.$path, path));
+                    e.path(joinUrl(this.$path, path));
                 }
             }
         });
@@ -58,15 +65,17 @@ class Routes extends ConfigObjectBase {
             if(route.setup && isFunction(route.setup)) {
                 // Let's setup the routes into app
                 route.setup(app);
-                debug("Setting path {{path}} using routes directly", {path});
-            } else if(route.func && isFunction(route.func)) {
-                debug("Setting up path {{path}} using route", {path});
+                debug("Setting path {{path}} using routes directly", {path: joinUrl(this.$path, path)});
+            } else if(route.run && isFunction(route.run)) {
+                debug("Setting up path {{path}} using route", {path: joinUrl(this.$path, path)});
                 // Add the route into the chain
-                chain.push(route.func());
+                chain.push((req, res) => { 
+					return route.run(req, res);
+				});
                 chain.unshift(path);
                 method.apply(router, chain);
             } else if(isFunction(route)) {
-                debug("Setting up path {{path}} using simple", {path: resolve(this.$path, path)});
+                debug("Setting up path {{path}} using simple", {path: joinUrl(this.$path, path)});
                 // Add the route to the router
                 chain.push(route);
                 chain.unshift(path);
@@ -94,9 +103,6 @@ class Routes extends ConfigObjectBase {
         // Let's setup the router into express
         app.use(this.$path, router);
     }
-}
-
-class Route extends ConfigObjectBase {
 }
 
 class ReactRoute extends Route {
@@ -134,12 +140,6 @@ class ReactUI extends Route {
 	}
 }
 
-class RedirectRoute extends Route {
-    func() {
-        return (req, res) => (res.redirect(this.to));
-    }
-}
-
 const notFound = (req, res) => {
     res.status(404).send("Page Not Found!");
 }
@@ -171,6 +171,7 @@ module.exports = {
     Routes,
     ReactUI,
     ReactRoute,
+	ElementRoute,
     dashboard,
     dashboardDemo,
     notFound,

@@ -1,0 +1,53 @@
+################################################################################
+#
+# This is the conifguration file for the front end project
+#
+# @author Jack <jack@thinkingcloud.info>
+# @version 0.0.1
+# @date Thu Feb 22 15:28:14 2018
+#
+################################################################################
+
+#===============================================================================
+#
+# Include the values in package.json
+#
+#===============================================================================
+
+#json ./package.json
+
+#===============================================================================
+#
+# Section Templates
+#
+#===============================================================================
+
+
+#===============================================================================
+#
+# Section Webpack
+#
+#===============================================================================
+webpack:
+    entry: # The entry settings
+        bundle: index.js
+    output: # The output settings
+        path: $(__dir)/dist
+        filename: "[name].js"
+    resolve:
+        modules: 
+            - $(__dir)/src
+        extensions: 
+            - .js
+            - .jsx
+    ^module/rules:
+        -
+            @test: \.js(x)?$
+            @exclude: node_modules
+            include: $(__dir)/src
+            use:
+                loader: babel-loader
+                options:
+                    presets:
+                        - react
+                    cacheDirectory: true

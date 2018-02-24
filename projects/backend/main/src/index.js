@@ -17,4 +17,4 @@ const { init_express, start_app, handle_error,  add_routes } = require("./functi
 proxy_exclude_patterns([/.*node_modules.*/]);
 
 configure([init_express, add_routes])
-    .then(start_app).catch(console.error);
+    .then(start_app).catch(handle_error);

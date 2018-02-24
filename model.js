@@ -6,9 +6,11 @@
  * @date Tue Feb  6 17:28:03 2018
  */
 
-const { ConfigObjectBase } = require("@guitarpoet/configurator");
+const { ConfigObjectBase, moduleConfig } = require("@guitarpoet/configurator");
+const { getModule } = require("hot-pepper-jelly");
 const { arrayMerge } = require("./functions");
 const path = require("path");
+const Module = require("module");
 
 class Projects extends ConfigObjectBase {
     _init() {
@@ -55,6 +57,38 @@ class Project extends ConfigObjectBase {
 
     $basePath() {
         return path.resolve(this.base);
+    }
+
+    $initializer() {
+        return this.initializer;
+    }
+
+    $config() {
+        let init = this.$initializer();
+        if(init) {
+            return moduleConfig(init.$module);
+        }
+        return null;
+    }
+
+    $nodeModule() {
+        return getModule(this.$initializer().$module);
+    }
+
+    $configFile() {
+        return this.configFile || "./config.yaml";
+    }
+
+    $watchFolders() {
+        let w = this.watchFolders || [];
+        return w.map(f => path.resolve(path.join(this.base, f)));
+    }
+
+    $webpackConfig() {
+        if(this.webpack && this.webpack.config) {
+            let f = path.resolve(path.join(this.base, this.webpack.config));
+            return f;
+        }
     }
 
     $packageConfig() {

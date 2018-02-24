@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<% element.$css().map(function(css) { %>
+	<link rel="stylesheet" href="<%=css%>">
+	<% }) %>
+</head>
+<body>
+<div id="root">
+	<% element.$js().map(function(js) { %>
+	<script src="<%=js%>"></script>
+	<% }) %>
+</div>
+</body>
+</html>

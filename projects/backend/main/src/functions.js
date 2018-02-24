@@ -2,6 +2,7 @@ const { debug, log, global_registry, watch_and_reload, feature_enabled } = requi
 const express = require("express");
 const { get, isFunction, keys } = require("lodash");
 const { Routes } = require("./models");
+const path = require("path");
 
 /**
  * This will init the express using the config
@@ -46,7 +47,11 @@ const add_routes = (app) => {
         // This is only for testing
         return;
     }
+
     let { route_config, elements } = app.$config;
+
+    app.set("view engine", "ejs");
+	app.set("views", path.join(__dirname, "../views"));
 
     if(route_config.setup && isFunction(route_config.setup)) {
         route_config.setup(app);

@@ -16,6 +16,7 @@
 #
 #===============================================================================
 
+file: $(__file)
 projects:
     $type: module
     $module: ./model
@@ -24,14 +25,15 @@ projects:
         -
             $base: *project-template
             base: ./projects/backend/main
-            initializer: init.js
+            initializer:
+                $type: function
+                $module: ./projects/backend/main/src/functions.js
+                $name: add_routes
             watchFolders:
-                - src/router
-                - src/utils
+                - src
+                - src/routes
     ^frontend/projects: # The frontend project configuration
         -
             $base: *project-template
             base: ./projects/frontend/main
-            webpack: # The webpack configuration
-                config:
-                    - webpack/webpack.development
+            ^webpack/config: config.yaml
