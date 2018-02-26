@@ -3,6 +3,7 @@ const express = require("express");
 const { get, isFunction, keys } = require("lodash");
 const { Routes } = require("./models");
 const path = require("path");
+const { config } = require("@guitarpoet/configurator");
 
 /**
  * This will init the express using the config
@@ -41,6 +42,9 @@ const start_app = (app) => {
         });
     });
 }
+const get_routes = () => {
+	return config(require)("./config.yaml");
+}
 
 const add_routes = (app) => {
     if(feature_enabled("mock")) {
@@ -67,5 +71,6 @@ module.exports = {
     init_express,
     start_app,
     add_routes,
+	get_routes,
     handle_error
 }

@@ -20,120 +20,147 @@ const joinUrl = (base, url) => {
 }
 
 class Routes extends ConfigObjectBase {
-    _init() {
-        if(this.root) {
-            this.path(this.root);
-        }
-    }
+	_init() {
+		if(this.root) {
+			this.path(this.root);
+		}
+	}
 
-    each(func) {
-        let routes = this.routes || {};
+	each(func) {
+		let routes = this.routes || {};
 
-        for(let path in routes) {
-            func(path, routes[path]);
-        }
-    }
+		for(let path in routes) {
+			func(path, routes[path]);
+		}
+	}
 
-    path(path) {
-        this.$path = path;
-        this.each((path, route) => {
-            for(let e of [route, route.$ui]) {
-                if(e && e.path && isFunction(e.path)) {
-                    // It is a routes settings
-                    e.path(joinUrl(this.$path, path));
-                }
-            }
-        });
-    }
+	path(path) {
+		this.$path = path;
+		this.each((path, route) => {
+			for(let e of [route, route.$ui]) {
+				if(e && e.path && isFunction(e.path)) {
+					// It is a routes settings
+					e.path(joinUrl(this.$path, path));
+				}
+			}
+		});
+	}
 
-    setup(app) {
-        // Let's setup the router now
-        let router = this.$router || {};
+	setup(app) {
+		// Let's setup the router now
+		let router = this.$router || {};
 
-        // Setup the router
-        router = new Router(router);
+		// Setup the router
+		router = new Router(router);
 
-        // Then, let's setup the routes for the router
-        this.each((path, route) => {
-            // Get the method for router
-            let method = route.method || "get";
-            method = router[method] || router.get;
+		// Then, let's setup the routes for the router
+		this.each((path, route) => {
+			// Get the method for router
+			let method = route.method || "get";
+			method = router[method] || router.get;
 
-            let chain = route.filters || [];
+			let chain = route.filters || [];
 
-            // Let's setup the routes
-            if(route.setup && isFunction(route.setup)) {
-                // Let's setup the routes into app
-                route.setup(app);
-                debug("Setting path {{path}} using routes directly", {path: joinUrl(this.$path, path)});
-            } else if(route.run && isFunction(route.run)) {
-                debug("Setting up path {{path}} using route", {path: joinUrl(this.$path, path)});
-                // Add the route into the chain
-                chain.push((req, res) => { 
+			// Let's setup the routes
+			if(route.setup && isFunction(route.setup)) {
+				// Let's setup the routes into app
+				route.setup(app);
+				debug("Setting path {{path}} using routes directly", {path: joinUrl(this.$path, path)});
+			} else if(route.run && isFunction(route.run)) {
+				debug("Setting up path {{path}} using route", {path: joinUrl(this.$path, path)});
+				// Add the route into the chain
+				chain.push((req, res) => {
 					return route.run(req, res);
 				});
-                chain.unshift(path);
-                method.apply(router, chain);
-            } else if(isFunction(route)) {
-                debug("Setting up path {{path}} using simple", {path: joinUrl(this.$path, path)});
-                // Add the route to the router
-                chain.push(route);
-                chain.unshift(path);
-                method.apply(router, chain);
-            }
-        });
+				chain.unshift(path);
+				method.apply(router, chain);
+			} else if(isFunction(route)) {
+				debug("Setting up path {{path}} using simple", {path: joinUrl(this.$path, path)});
+				// Add the route to the router
+				chain.push(route);
+				chain.unshift(path);
+				method.apply(router, chain);
+			}
+		});
 
-        // Then, let's add the handlers for this routes
-        let handlers = this.handlers || {};
+		// Then, let's add the handlers for this routes
+		let handlers = this.handlers || {};
 
-        let notFoundHandler = handlers[404];
-        let serverErrorHandler = handlers[500];
+		let notFoundHandler = handlers[404];
+		let serverErrorHandler = handlers[500];
 
-        if(serverErrorHandler) {
-            // Add the error handler
-            router.use(serverErrorHandler);
-        }
+		if(serverErrorHandler) {
+			// Add the error handler
+			router.use(serverErrorHandler);
+		}
 
-        if(notFoundHandler) {
-            // Add the not found handler to the last
-            router.all("*", notFoundHandler);
-        }
+		if(notFoundHandler) {
+			// Add the not found handler to the last
+			router.all("*", notFoundHandler);
+		}
 
-        debug("Setting up path {{path}}", {path: this.$path});
-        // Let's setup the router into express
-        app.use(this.$path, router);
-    }
+		debug("Setting up path {{path}}", {path: this.$path});
+		// Let's setup the router into express
+		app.use(this.$path, router);
+	}
 }
 
 class ReactRoute extends Route {
-    path(path = null) {
-        if(path) {
-            this.$path = path;
-            if(this.element && this.element.$addRoute) {
-                // Add this to the element's route
-                this.element.$addRoute(path, this);
-            }
-        }
-        return this.$path;
-    }
+
+	$component() {
+		let name = this.component.name;
+		if(!name) {
+			let m = this.component.module;
+			// We are importing the module directly
+			name = m.replace("/", "_");
+		} else {
+			name = `{ ${name} }`;
+		}
+		return name;
+	}
+
+	$toImport() {
+		if(this.component && this.component.module) {
+			let m = this.component.module;
+			let name = this.$component();
+			return `import ${name} from "${m}";`;
+		}
+	}
+
+	$toElement() {
+		let p = this.path();
+		let c = this.$component();
+		return `React.createElement(Route, { path: "${p}", key: "${p}", component: ${c} }),`;
+	}
+
+	path(path = null) {
+		if(path) {
+			this.$path = path;
+			if(this.element && this.element.$addRoute) {
+				// Add this to the element's route
+				this.element.$addRoute(path, this);
+			}
+		}
+		return this.$path;
+	}
 }
 
 class ReactUI extends Route {
-    $addRoute(path, route) {
+	$addRoute(path, route) {
 		if(!ReactUI.$elements) {
 			ReactUI.$elements = {};
 		}
 
-        if(!ReactUI.$elements[this.entry]) {
-            ReactUI.$elements[this.entry] = {};
-        }
+		if(!ReactUI.$elements[this.entry]) {
+			ReactUI.$elements[this.entry] = {};
+		}
 
-        ReactUI.$elements[this.entry][path] = route;
-    }
+		ReactUI.$elements[this.entry][path] = route;
+	}
 
-    $routes() {
-        return ReactUI.$elements[this.entry];
-    }
+	$routes() {
+		return ReactUI.$elements[this.entry];
+	}
 
 	$ui() {
 		return ReactUI;
@@ -141,41 +168,41 @@ class ReactUI extends Route {
 }
 
 const notFound = (req, res) => {
-    res.status(404).send("Page Not Found!");
+	res.status(404).send("Page Not Found!");
 }
 
 const serverError = (err, req, res, next) => {
-    res.status(500).send("Internal server error!");
+	res.status(500).send("Internal server error!");
 }
 
 const dashboard = (req, res) => {
-    res.send("Dashboard Test");
+	res.send("Dashboard Test");
 }
 
 const dashboardDemo = (req, res) => {
-    res.send("Dashboard Demo");
+	res.send("Dashboard Demo");
 }
 
 const test = (req, res) => {
-    res.send("Test Again");
+	res.send("Test Again");
 }
 
 const logRequest = (req, res, next) => {
-    log(req.url);
-    next();
+	log(req.url);
+	next();
 }
 
 module.exports = {
-    Route,
-    RedirectRoute,
-    Routes,
-    ReactUI,
-    ReactRoute,
+	Route,
+	RedirectRoute,
+	Routes,
+	ReactUI,
+	ReactRoute,
 	ElementRoute,
-    dashboard,
-    dashboardDemo,
-    notFound,
-    serverError,
-    test,
-    logRequest
+	dashboard,
+	dashboardDemo,
+	notFound,
+	serverError,
+	test,
+	logRequest
 }

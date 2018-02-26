@@ -57,6 +57,9 @@ elements:
         $type: module
         $module: ./uis/WebpackUI
         entry: /bundle.js # This is the entry file, mostly it is used for webpack, so if you don't have webpack, you can leave this as blank
+        #ifenv DEV_SERVER
+        js: [ /__hot_reload.js ]
+        #endif
 
 #===============================================================================
 #
@@ -77,6 +80,15 @@ route_config:
         /dashboard:
             $base: *base-routes
             routes:
+                "":
+                    $base: *base-element-route
+                    $ui: 
+                        $base: *base-react-route
+                        element: *dashboard-ui
+                        attrs:
+                            - requireAuth
+                            - exact
+                        ^component/module: pages/Dashboard
                 /:
                     $base: *base-element-route
                     $ui: 

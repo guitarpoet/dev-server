@@ -1,0 +1,14 @@
+import { Route, IndexRoute } from "react-router";
+import React from "react";
+
+{{#each imports}}
+{{{.}}}
+{{/each}}
+
+const Routing = [
+	{{#each routes}}
+	{{{.}}}
+	{{/each}}
+];
+
+export default Routing;

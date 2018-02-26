@@ -40,14 +40,29 @@ webpack:
         extensions: 
             - .js
             - .jsx
+    plugins:
+        -
+            $type: module
+            $module: webpack
+            $name: DefinePlugin
+            test: 123
     ^module/rules:
         -
             @test: \.js(x)?$
             @exclude: node_modules
             include: $(__dir)/src
             use:
-                loader: babel-loader
-                options:
-                    presets:
-                        - react
-                    cacheDirectory: true
+                # We will make the routing generation to the top
+                -
+                    loader: ./webpack/route
+                    options:
+                        routerAccessor:
+                            $type: function
+                            $module: ./projects/backend/main/src/functions.js
+                            $name: get_routes
+                -
+                    loader: babel-loader
+                    options:
+                        presets:
+                            - react
+                        cacheDirectory: true

@@ -14,6 +14,7 @@ const { pipe, log, proxy_patterns, debug, global_registry, enable_features } = r
 const { bootstrap, nodepath, filterMatch, init_express, init_webpack, start_app } = require("./functions");
 const path = require("path");
 const webpackDevMiddleware = require("webpack-dev-middleware"); // The webpack dev middleware
+const webpackReloadMiddleware = require("./webpack/reload");
 
 // Let's exclude all node modules files
 proxy_patterns([/.*models.js/, /.*[a-z]Route.js/]);
@@ -76,7 +77,13 @@ normal_start(require, {
                     // Now, let's init the front end's webpack
                     return config(require)(p.$webpackConfig()).then((config) => {
                         return new Promise((resolve, reject) => {
-                            app.use(webpackDevMiddleware(init_webpack(config), {
+                            let compiler = init_webpack(config);
+                            app.$compiler = compiler;
+
+                            // Let's initialize the hot reload
+                            app.use(webpackReloadMiddleware(app, compiler));
+
+                            app.use(webpackDevMiddleware(compiler, {
                                 noInfo: true,
                                 log: debug,
                                 hot: true,
