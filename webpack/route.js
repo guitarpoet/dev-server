@@ -21,7 +21,6 @@ const getConfig = (option = {}) => {
 			if(routerAccessor && isFunction(routerAccessor)) {
 				return routerAccessor().then(c => {
 					_config = c;
-				//	console.info(c.elements["dashboard-ui"].$ui().$elements);
 					resolve(c);
 				});
 			} else {
@@ -40,6 +39,10 @@ const loader = function(content, map) {
 	let option = getOptions(this);
 	let callback = this.async();
 	getConfig(option).then((config) => {
+		if(!config.__added) {
+			this.dependency(config.__file);
+			config.__added = true;
+		}
 		let m = content.match(AUTO_REPLACE_REGEX);
 		// We only auto generate the ROUTING that needs to be auto
 		if(m) {
@@ -69,6 +72,10 @@ const loader = function(content, map) {
 
 		callback(null, content, map)
 	}).catch(callback);
+}
+
+loader.pitch = () => {
+	_config = null;
 }
 
 module.exports = loader;
